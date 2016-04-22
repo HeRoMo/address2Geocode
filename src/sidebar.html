@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+</head>
+<body>
+  <div class="sidebar branding-below">
+    <h3>住所 ▶ 緯度・経度 変換ツール</h3>
+    <div>
+      <p>住所を記入したセルを選択して、[住所 ▶ 緯度・経度]のボタンを押してください。<br>
+       連続した複数のセルを選択することもできます。<br>
+      </p>
+    </div>
+    <div class="block form-group">
+      <label for='outColumn'><b>出力カラム:</b></label>
+      <select id="outColumn" name="outColumn"></select>
+    </div>
+    <div id="execButton" class="block">
+     <button id="exec" class="blue">住所 ▶ 緯度・経度</button>
+    </div>
+    <div id="notice" class="block">
+      <h4>注意</h4>
+      <ul>
+        <li>処理が終わってから、結果がスプレッドシートに反映されるまで若干時間があります</li>
+        <li>精度は番地レベルです</li>
+        <li>複数の列を選択した時には左端の列が住所とみなします</li>
+      </ul>
+    </div>
+  </div>
+  <div id="credit" class="sidebar bottom">
+    <h4>利用API</h4>
+    <p><a href="http://newspat.csis.u-tokyo.ac.jp/geocode/modules/geocode/index.php?content_id=1">CSISシンプルジオコーディング実験</a>
+     （<a href="http://nlftp.mlit.go.jp/isj/">街区レベル位置参照情報</a>）利用</p>
+  </div>
+<script type="text/javascript">
+  (function(){
+  "use strict";
+
+  // 出力カラム選択肢の初期化
+  function initOutColOpt(){
+    var select = document.querySelector('#outColumn');
+    var num = 25;
+    for(var i = 1; i <=num; i++){
+      var opt = document.createElement('option')
+      var lonCol = String.fromCharCode(64+i)
+      var latCol = String.fromCharCode(64+i+1)
+      opt.innerText= "緯度:"+lonCol+"列,経度:"+latCol+"列"
+      opt.value=i;
+      if(i==5){opt.selected="selected"}
+      select.appendChild(opt)
+    }
+  }
+
+  //変換の実行
+  function convertAddr2geocode(){
+    var outColumn = document.querySelector('#outColumn').value;
+    google.script.run
+    .withSuccessHandler(
+      function(msg, element) {
+        //alert('Success');
+      })
+    .withFailureHandler(
+      function(msg, element) {
+        alert('Error:' + msg + element)
+      })
+    .withUserObject(this)
+    .batchGeocode(outColumn);
+  }
+  document.querySelector('#exec').addEventListener('click', convertAddr2geocode, false);
+  initOutColOpt();
+  })();
+</script>
+</body>
+</html>
