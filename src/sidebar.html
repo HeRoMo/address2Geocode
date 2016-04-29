@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <base target="_top">
   <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+  <style type="text/css">
+    .error { color:red;}
+  </style>
 </head>
 <body>
   <div class="sidebar branding-below">
@@ -17,21 +21,25 @@
       <select id="outColumn" name="outColumn"></select>
     </div>
     <div id="execButton" class="block">
-     <button id="exec" class="blue">住所 ▶ 緯度・経度</button>
+      <button id="exec" class="blue">住所 ▶ 緯度・経度</button>
     </div>
+    <div id="result" class="block"></div>
+  </div>
+  <div class="sidebar bottom">
     <div id="notice" class="block">
       <h4>注意</h4>
       <ul>
+        <li>変換できるのは日本の住所のみです</li>
         <li>処理が終わってから、結果がスプレッドシートに反映されるまで若干時間があります</li>
         <li>精度は番地レベルです</li>
         <li>複数の列を選択した時には左端の列が住所とみなします</li>
       </ul>
     </div>
-  </div>
-  <div id="credit" class="sidebar bottom">
-    <h4>利用API</h4>
-    <p><a href="http://newspat.csis.u-tokyo.ac.jp/geocode/modules/geocode/index.php?content_id=1">CSISシンプルジオコーディング実験</a>
-     （<a href="http://nlftp.mlit.go.jp/isj/">街区レベル位置参照情報</a>）利用</p>
+    <div id="credit" class="block">
+      <h4>利用API</h4>
+      <p><a href="http://newspat.csis.u-tokyo.ac.jp/geocode/modules/geocode/index.php?content_id=1">CSISシンプルジオコーディング実験</a>
+       （<a href="http://nlftp.mlit.go.jp/isj/">街区レベル位置参照情報</a>）利用</p>
+    </div>
   </div>
 <script type="text/javascript">
   (function(){
@@ -52,21 +60,48 @@
     }
   }
 
-  //変換の実行
+  /**
+   * 住所=>緯度経度変換の実行
+   */
   function convertAddr2geocode(){
+    showResult('')
     var outColumn = document.querySelector('#outColumn').value;
     google.script.run
-    .withSuccessHandler(
-      function(msg, element) {
-        //alert('Success');
-      })
-    .withFailureHandler(
-      function(msg, element) {
-        alert('Error:' + msg + element)
-      })
+    .withSuccessHandler(onSuccess)
+    .withFailureHandler(onError)
     .withUserObject(this)
     .batchGeocode(outColumn);
   }
+
+  /**
+   * 成功時の処理
+   * @param  {[type]} msg [description]
+   * @return {[type]}     [description]
+   */
+  function onSuccess(msg){
+    // TODO Implements
+  }
+
+  /**
+   * エラー時の処理
+   * エラーメッセージを表示する。
+   * @param  [String] error エラーメッセージ
+   */
+  function onError(error){
+    if (error.indexOf('NetworkError:')>=0){
+      var msg = 'ネットワークに接続できません'
+    } else {
+      var msg = 'エラーが発生しました'
+    }
+    msg = '<span class="error">' + msg + '</span>'
+    showResult(msg)
+  }
+
+  function showResult(msg){
+    var err = document.querySelector("#result")
+    err.innerHTML=msg
+  }
+
   document.querySelector('#exec').addEventListener('click', convertAddr2geocode, false);
   initOutColOpt();
   })();

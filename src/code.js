@@ -26,12 +26,16 @@ function showSidebar(){
 /**
  *  文字列から緯度経度を求める関数（シンプルジオコーディング実験 API版）
  *  @param 住所を表す文字列
- *  @return 緯度、経度の配列
+ *  @return 緯度、経度の配列。リクエストに失敗した場合には文字列 'ERROR' を返す
  */
 function geocode(address){
   if (!address||address == ''){return ''}
   var url = "http://newspat.csis.u-tokyo.ac.jp/cgi-bin/simple_geocode.cgi?addr=" + address;
-  var res = UrlFetchApp.fetch(url)
+  try {
+    var res = UrlFetchApp.fetch(url)
+  } catch(err) {
+    return 'ERROR'
+  }
   if(res.getResponseCode()!=200){return 'ERROR'}
   var xml = XmlService.parse(res.getContentText());
   var root = xml.getRootElement()
