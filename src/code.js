@@ -76,8 +76,7 @@ function batchGeocode(outCol){
   }
   outRange.setValues(outVals)
 
-  var ui = SpreadsheetApp.getUi();
-  ui.alert("処理を終了しました" , ui.ButtonSet.OK);
+  SpreadsheetApp.getActiveSpreadsheet().toast("処理が完了しました。", '完了', 5);
 }
 
 /*
