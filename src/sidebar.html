@@ -5,13 +5,14 @@
   <base target="_top">
   <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
   <style type="text/css">
-    .error { color:red;}
     #spiner {
       height: 27px;
       width:27px;
       margin-bottom: -10px;
       display: none;
     }
+    #outColumn { margin-left: 25px}
+    span.result { margin-left: 10px; }
   </style>
 </head>
 <body>
@@ -108,10 +109,15 @@
    * @param  [String] msg スクリプトからの戻り値
    * @param  [Object] withUserObject で渡した値
    */
-  function onSuccess(msg, element){
+  function onSuccess(result, element){
     document.querySelector('#spiner').style.display='none'
     element.disabled = false;
     // TODO Implements
+    var msg = '<b>結果:</b><br>'
+    msg+='<span class="result">住所数：%d</span><br>'.replace('%d', result.addr)
+    msg+='<span class="result">スキップ数：%d</span><br>'.replace('%d', result.skip)
+    msg+='<span class="result">失敗数：%d</span><br>'.replace('%d', result.fail)
+    showResult(msg)
   }
 
   /**
