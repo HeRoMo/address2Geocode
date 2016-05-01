@@ -12,7 +12,7 @@ function onInstall() {
   onOpen();
 }
 
-/*
+/**
  * サイドバーの表示
  */
 function showSidebar(){
@@ -61,6 +61,7 @@ function batchGeocode(outCol){
   var values = addrRange.getValues();
 
   var sheet = SpreadsheetApp.getActiveSheet()
+  if(outCol < 0){ outCol = addrRange.getColumn() + 1 }
   var outRange = sheet.getRange(addrRow, outCol,addrNumRows,outNumCols) //出力レンジ
   var outRangeVals = outRange.getValues();
   var outRangeFoms = outRange.getFormulas();

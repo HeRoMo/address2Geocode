@@ -7,11 +7,11 @@
   <style type="text/css">
     .error { color:red;}
     #spiner {
-    height: 27px;
-    width:27px;
-    margin-bottom: -10px;
-    display: none;
-}
+      height: 27px;
+      width:27px;
+      margin-bottom: -10px;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -22,9 +22,17 @@
        連続した複数のセルを選択することもできます。<br>
       </p>
     </div>
+    <p><b>出力カラム設定:</b></p>
+    <div>
+      <input type="radio" name="output" id="output1" checked>
+      <label for="output1">選択カラムの右側に出力する</label>
+    </div>
+    <div>
+      <input type="radio" name="output" id="output2">
+      <label for="output2">選択したカラムに出力する</label>
+    </div>
     <div class="block form-group">
-      <label for='outColumn'><b>出力カラム:</b></label>
-      <select id="outColumn" name="outColumn"></select>
+      <select id="outColumn" name="outColumn" disabled="disabled"></select>
     </div>
     <div id="execButton" class="block">
       <button id="exec" class="blue">住所 ▶ 緯度・経度</button>
@@ -74,7 +82,7 @@
     this.disabled = true;
     document.querySelector('#spiner').style.display='inline-block'
     showResult('')
-    var outColumn = document.querySelector('#outColumn').value;
+    var outColumn = outputColumn();
     google.script.run
     .withSuccessHandler(onSuccess)
     .withFailureHandler(onError)
@@ -83,9 +91,22 @@
   }
 
   /**
+   * 出力カラムのインデックスを取得する
+   * @return [Integer] デフォルトを選択している時 -1、それ以外はselectの選択値
+   */
+  function outputColumn(){
+    var isDefault = document.querySelector('input[name="output"][checked]').checked;
+    if(isDefault){
+      return -1;
+    } else {
+      return document.querySelector('#outColumn').value;
+    }
+  }
+
+  /**
    * 成功時の処理
-   * @param  {[type]} msg [description]
-   * @return {[type]}     [description]
+   * @param  [String] msg スクリプトからの戻り値
+   * @param  [Object] withUserObject で渡した値
    */
   function onSuccess(msg, element){
     document.querySelector('#spiner').style.display='none'
@@ -101,7 +122,10 @@
   function onError(error,element){
     document.querySelector('#spiner').style.display='none'
     element.disabled = false;
-    if (error.indexOf('NetworkError:')>=0){
+    var type = typeof error
+    if(type === 'object'){
+      var msg = error.message
+    } else if (type === 'string' && error.indexOf('NetworkError:')>=0){
       var msg = 'ネットワークに接続できません'
     } else {
       var msg = 'エラーが発生しました'
@@ -110,11 +134,28 @@
     showResult(msg)
   }
 
+  /**
+   * [showResult description]
+   * @param  [String] msg 出力メッセージ
+   */
   function showResult(msg){
     var err = document.querySelector("#result")
     err.innerHTML=msg
   }
 
+  /**
+   * 出力設定のchange イベント処理
+   */
+  function onChangeOutputSetting(){
+    var isDefault = document.querySelector('input[name="output"][checked]').checked
+    if(isDefault){ document.querySelector("#outColumn").disabled=true
+    } else { document.querySelector("#outColumn").disabled=false }
+  }
+
+  // Initilize
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="output"'),
+    function(elm){elm.addEventListener('click', onChangeOutputSetting, false)}
+  )
   document.querySelector('#exec').addEventListener('click', convertAddr2geocode, false);
   initOutColOpt();
   })();
