@@ -111,7 +111,11 @@ function reselectRange(){
   var dRange = sheet.getDataRange()
   var dRow = Math.min(dRange.getLastRow(),range.getLastRow())+1;
   Logger.log("rowindex: %s, column: %s, lastrow %s", row, col, dRow)
-  var activeRange = sheet.getRange(row, col, dRow-row)
-  sheet.setActiveRange(activeRange)
+  try {
+    var activeRange = sheet.getRange(row, col, dRow-row)
+    sheet.setActiveRange(activeRange)
+  } catch(e){
+    throw new Error('住所が入力されたカラムまたはセルを選択してください。')
+  }
   return activeRange
 }
