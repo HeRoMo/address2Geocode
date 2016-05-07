@@ -5,6 +5,7 @@
   <base target="_top">
   <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
   <style type="text/css">
+    div.sidebar{background-color: white;}
     #spiner {
       height: 27px;
       width:27px;
@@ -13,6 +14,13 @@
     }
     #outColumn { margin-left: 25px}
     span.result { margin-left: 10px; }
+    span.notice { color:red; }
+    div.block h4,p,ul {
+      margin-top: 3px;
+      margin-bottom: 3px;
+    }
+    ul {padding-left: 20px;}
+    div.bottom {z-index: -1}
   </style>
 </head>
 <body>
@@ -45,7 +53,6 @@
     <div id="notice" class="block">
       <h4>注意</h4>
       <ul>
-        <li>変換できるのは日本の住所のみです</li>
         <li>精度は番地レベルです</li>
         <li>複数の列を選択した時には左端の列が住所とみなします</li>
       </ul>
