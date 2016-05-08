@@ -5,7 +5,7 @@
   <base target="_top">
   <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
   <style type="text/css">
-    div.sidebar{background-color: white;}
+    div.sidebar{ background-color: white; }
     #spiner {
       height: 27px;
       width:27px;
@@ -19,8 +19,8 @@
       margin-top: 3px;
       margin-bottom: 3px;
     }
-    ul {padding-left: 20px;}
-    div.bottom {z-index: -1}
+    ul { padding-left: 20px; }
+    div.bottom { z-index: -1 }
   </style>
 </head>
 <body>
@@ -59,7 +59,8 @@
     </div>
     <div id="credit" class="block">
       <h4>利用API</h4>
-      <p><a href="http://newspat.csis.u-tokyo.ac.jp/geocode/modules/geocode/index.php?content_id=1">CSISシンプルジオコーディング実験</a>
+      <p><a href="http://newspat.csis.u-tokyo.ac.jp/geocode/modules/geocode/index.php?content_id=1">
+        CSISシンプルジオコーディング実験</a>
        （<a href="http://nlftp.mlit.go.jp/isj/">街区レベル位置参照情報</a>）利用</p>
     </div>
   </div>
@@ -112,17 +113,28 @@
 
   /**
    * 成功時の処理
+   * 結果 を表示する
    * @param  [String] msg スクリプトからの戻り値
    * @param  [Object] withUserObject で渡した値
    */
   function onSuccess(result, element){
     document.querySelector('#spiner').style.display='none'
     element.disabled = false;
-    // TODO Implements
     var msg = '<b>結果:</b><br>'
     msg+='<span class="result">住所数：%d</span><br>'.replace('%d', result.addr)
     msg+='<span class="result">スキップ数：%d</span><br>'.replace('%d', result.skip)
-    msg+='<span class="result">失敗数：%d</span><br>'.replace('%d', result.fail)
+    msg+='<span class="result">失敗数：%d</span>'.replace('%d', result.fail)
+    // エラー発生時の表示の追加
+    if(result.fail>0){
+      msg+=' ( <a href="https://github.com/HeRoMo/address2geocode/wiki/HELP#%E5%A4%89%E6%8F%9B%E3%81%AB%E5%A4%B1%E6%95%97%E3%81%97%E3%81%A6%E3%81%84%E3%82%8B%E4%BD%8F%E6%89%80%E3%81%8C%E3%81%82%E3%82%8B%E3%82%88%E3%81%86%E3%81%A7%E3%81%99%E3%81%8C%E7%90%86%E7%94%B1%E3%81%8C%E3%82%8F%E3%81%8B%E3%82%8A%E3%81%BE%E3%81%9B%E3%82%93">ヘルプ</a> )'
+    }
+    if(result.messages.length > 0){
+      msg+='<ul>'
+      result.messages.forEach(function(e){
+        msg+='<li>%s</li>'.replace('%s', e);
+      })
+      msg+='</ul>'
+    }
     showResult(msg)
   }
 
@@ -160,8 +172,7 @@
    */
   function onChangeOutputSetting(){
     var isDefault = document.querySelector('input[name="output"][checked]').checked
-    if(isDefault){ document.querySelector("#outColumn").disabled=true
-    } else { document.querySelector("#outColumn").disabled=false }
+    document.querySelector("#outColumn").disabled=isDefault
   }
 
   // Initilize

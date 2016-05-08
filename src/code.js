@@ -34,13 +34,13 @@ function geocode(address){
   try {
     var res = UrlFetchApp.fetch(url)
   } catch(err) {
-    return 'ERROR'
+    return 'ERROR:This add-on only accepts Japanese characters/locations.'
   }
   if(res.getResponseCode()!=200){return 'ERROR'}
   var xml = XmlService.parse(res.getContentText());
   var root = xml.getRootElement()
   var candidate = root.getChild("candidate")
-  if(!candidate) {return 'No Result.'}
+  if(!candidate) {return 'ERROR:日本の住所と認識できない文字列があります'}
   var latitude = candidate.getChildText('latitude');
   var longitude = candidate.getChildText('longitude');
   return [ [ latitude , longitude ] ];
@@ -54,7 +54,7 @@ function geocode(address){
  */
 function batchGeocode(outCol){
   var outNumCols = 2 //出力のカラム幅。緯度と経度で2カラム
-  var result = {addr:0,skip:0,fail:0}
+  var result = {addr:0,skip:0,fail:0,messages:[]}
 
   //選択されているレンジから住所を取得し、変換する
   var addrRange = reselectRange();
@@ -75,10 +75,15 @@ function batchGeocode(outCol){
     var code = d(i); // 出力セルの値を一旦格納
     if (code == null){ //出力セルが空の時だけ処理
       code = geocode(address) //レンジの左端の列をループ
-      if(!Array.isArray(code)){
+      if(Array.isArray(code)){
+        code = code[0]
+      } else {
+        if(/^ERROR:/.test(code) && result.messages.indexOf(code.split(':')[1]) < 0){
+          result.messages.push(code.split(':')[1])
+        }
         code = ['','']
         result.fail++
-      }else{ code = code[0] }
+      }
     } else { if(!!address||address != ''){result.skip++}}
     outVals.push(code)
   }
@@ -118,7 +123,6 @@ function reselectRange(){
   var sheet = range.getSheet()
   var dRange = sheet.getDataRange()
   var dRow = Math.min(dRange.getLastRow(),range.getLastRow())+1;
-  Logger.log("rowindex: %s, column: %s, lastrow %s", row, col, dRow)
   try {
     var activeRange = sheet.getRange(row, col, dRow-row)
     sheet.setActiveRange(activeRange)
